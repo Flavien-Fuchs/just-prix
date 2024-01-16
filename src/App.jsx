@@ -1,52 +1,60 @@
 import { useState } from 'react'
-import styles from './App.module.css'
-import Price from "./components/Price"
-import Input from "./components/Input"
+import './App.css'
+import Price from "./components/Price";
 
 function App() {
-  const [valueInput, setValueInput] = useState(0)
-  const [page, setPage] = useState('acceuil')
-  const [score, setScore] = useState(0)
-  const [message, setMessage] = useState("")
+
   const [justPrice, setJustPrice] = useState(Math.round(Math.random(1) * 100))
+  console.log("price : " + justPrice)
+  const [page, setPage] = useState('accueil')
+  const [indice, setIndice] = useState(null)
+  const [essai, setEssai] = useState(0)
+
+  function startPlaying() {
+    setPage("game")
+  }
+
+  function replay() {
+    setJustPrice(Math.round(Math.random(1) * 100))
+    setEssai(0)
+    setPage("game")
+  }
 
   const handleClick = (value) => {
-    value = parseInt(value)
-    setValueInput(value)
-    verification(value)
-  }
-  const verification = (value) => {
-    console.log(value)
-    console.log(justPrice)
-    if (justPrice === valueInput) {
-      setMessage("GOOD JOB")
-      setScore(score + 1)
-    } else if (justPrice < value) {
-      setMessage("C'est en dessous !")
-    } else {
-      setMessage("C'est au dessus !")
+    event.preventDefault();
+    setEssai(essai + 1)
+
+    if (parseInt(value) === justPrice) {
+      setPage("win")
+      setIndice(null)
+    }
+    if (value < justPrice) {
+
+      setIndice("C'est + !")
+      setTimeout(() => {
+        setIndice(null)
+      }, "1500");
+    }
+
+    if (value > justPrice) {
+      setIndice("C'est - !")
+      setTimeout(() => {
+        setIndice(null)
+      }, "1500");
     }
   }
 
+
   return (
-    <div className={styles.container}>
-      <div className={styles.header}>
-        <h1>LE JUST PRICE</h1>
+    <>
+      <div className='header'><img src="./src/assets/images/logo.png" alt="logo" /></div>
+      <div className="container">
+        {indice && <p className='indice'>{indice}</p>}
+        {page === "accueil" && <button onClick={startPlaying}>Jouer !</button>}
+        {page === "game" && <div className='game'><p>Nombre d&apos;essai : {essai}</p><Price handleClick={handleClick} /></div>}
+        {page === "win" && <div className='win'><h1>bravo</h1><p>Vous avez gagné en {essai} essai(s)</p><button onClick={replay}>Rejouer ?</button></div>}
       </div>
-      <div className={styles.body}>
-        {page === 'acceuil' && <div className={styles.accueil}>
-          <div onClick={() => setPage("game")}>Jouer?</div>
-        </div>}
-        {page === 'game' && <div className={styles.game}>
-          <p>{score}</p>
-          <p>{message}</p>
-          <Input handleClick={handleClick} />
-          <Price justPrice={justPrice} />
-        </div>}
-
-      </div>
-
-    </div>
+    </>
   )
 }
 
